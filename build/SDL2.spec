@@ -1,9 +1,9 @@
-%global hgdate 20121107
-%global hgrev 6659
+%global hgdate 20130412
+%global hgrev 7062
 
 Name:		SDL2
 Version:	2.0
-Release:	0.1.20121107hg6659%{?dist}
+Release:	0.2.%{hgdate}hg%{hgrev}%{?dist}
 # hg clone http://hg.libsdl.org/SDL SDL2
 Summary:	Simple DirectMedia Layer v2
 License:	zlib
@@ -14,6 +14,9 @@ URL:		http://www.libsdl.org/
 Source0:	%{name}-%{hgdate}hg%{hgrev}.tar.bz2
 Source1:	SDL_config.h
 Patch0:		SDL2-2.0-multilib.patch
+# Fedora 19+ has libX11-devel-1.5.99.901, which has incompatible headers.
+# This patch alters SDL2 to match.
+Patch1:		SDL2-2.0-Xconst.patch
 BuildRequires:	alsa-lib-devel
 BuildRequires:	audiofile-devel
 BuildRequires:	mesa-libEGL-devel
@@ -60,6 +63,9 @@ developing SDL v2 applications.
 %prep
 %setup -q -n %{name}
 %patch0 -p1 -b .multilib
+%if 0%{?fedora} >= 19
+%patch1 -p1 -b .Xconst
+%endif
 
 for F in CREDITS; do 
     iconv -f iso8859-1 -t utf-8 < "$F" > "${F}.utf"
@@ -106,5 +112,8 @@ rm -rf %{buildroot}%{_libdir}/*.la %{buildroot}%{_libdir}/*.a
 %{_datadir}/aclocal/*
 
 %changelog
+* Fri Apr 12 2013 Tom Callaway <spot@fedoraproject.org> - 2.0-0.2.20130412hg7062
+- update to latest hg code
+
 * Wed Nov 7 2012 Tom Callaway <spot@fedoraproject.org> - 2.0-0.1.20121107hg6659
 - initial SDL2 package
